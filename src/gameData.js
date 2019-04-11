@@ -100,6 +100,15 @@ const gameData = {
     maxUsers: 20,
     component: Mafia,
   },
+
+  match: {
+    title: "Memory Match",
+    authors: "Destiny Luong, Kadie Truong",
+    description: "Players take turn flipping card to try and get a pair. Whoever has the most pairs in the end, wins.",
+    minUsers: 2,
+    maxUsers: 2,
+    component: Match,
+  },
 }
 
 export default gameData;
