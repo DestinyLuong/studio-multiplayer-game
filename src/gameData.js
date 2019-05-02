@@ -7,7 +7,8 @@ import TwentyOneQuestions from './games/twentyOneQuestions/TwentyOneQuestions.js
 import Spark from './games/spark/Spark.js';
 import uno from './games/uno/uno.js';
 import Mafia from './games/mafia/Mafia.js';
-import Pokemon from './games/pokemon/Pokemon.js'
+import Pokemon from './games/pokemon/Pokemon.js';
+import MemoryMatch from './games/memory/MemoryMatch.js';
 
 const gameData = {
 
@@ -105,9 +106,9 @@ const gameData = {
     title: "Memory Match",
     authors: "Destiny Luong, Kadie Truong",
     description: "Players take turn flipping card to try and get a pair. Whoever has the most pairs in the end, wins.",
-    minUsers: 2,
-    maxUsers: 2,
-    component: Match,
+    minUsers: 1,
+    maxUsers: 1,
+    component: MemoryMatch,
   },
 }
 
