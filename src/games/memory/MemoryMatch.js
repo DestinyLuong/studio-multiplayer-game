@@ -3,10 +3,60 @@ import React from 'react';
 import UserApi from '../../UserApi.js'
 
 export default class MemoryMatch extends GameComponent {
+    constructor(props){
+        super(props);
+        this.state = {
+                turn: "player1",
+                cards: {
+                    cardsValue: ["cake", "dog", "cake", "pen", "pen", "dog"],  
+                    cardsFlipped: [],
+                },
+                players:{
+                      player1:{
+                        id: this.getSessionCreatorUserId(),
+                        cardsClicked: 0,
+                        points: 0,
+                      }, 
+                      player2:{
+                        id:  this.getOtherSessionUserId(),
+                        cardsClicked: 0,
+                        points: 0,
+                    }, 
+              }
+            }
+    }
+    getOtherSessionUserID(){
+        //finds other person's session id
+    }
+    onSessionDataChanged(data){
+        //takes database info to update
+        this.setState({
+            turn: data.currentPlayer,
+        })
+
+    }
+    userAction(){
+        //user clicks cards
+      
+    }
+    stopClick(){
+        var buttons = this.state.cardsValue.map((state, i) => (
+        <button
+            disabled={!this.isMyTurn() || state !== "gone"}
+            onClick={() => this.handleButtonClick(i)}>
+          {state}
+        </button>
+        ));
+    }
+   /* cardsClicked(){
+        if(cardsFlipped === 2){
+            this.state.turn = data.currentplayer;
+        }
+    }*/
   newGame(){
       var gameData = {
         cards: {
-            cardIndex: [],  
+            cardsValue: [], 
             cardsFlipped: [],
         },
         players:{
