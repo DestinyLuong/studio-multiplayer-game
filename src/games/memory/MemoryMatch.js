@@ -18,7 +18,7 @@ export default class MemoryMatch extends GameComponent {
                         points: 0,
                       }, 
                       player2:{
-                        id:  this.getOtherSessionUserId(),
+                      //  id:  this.getOtherSessionUserId(),
                         cardsClicked: 0,
                         points: 0,
                     }, 
