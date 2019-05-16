@@ -9,7 +9,7 @@ export default class MemoryMatch extends GameComponent {
                 turn: "player1",
                 cards: {
                     cardsValue: ["cake", "dog", "cake", "pen", "pen", "dog"],  
-                    cardsFlipped: [],
+                    cardsFlipped: [false, false, false, false, false, false],
                 },
                 players:{
                       player1:{
@@ -18,7 +18,7 @@ export default class MemoryMatch extends GameComponent {
                         points: 0,
                       }, 
                       player2:{
-                      //  id:  this.getOtherSessionUserId(),
+                        id:  this.getSessionUserIds(),
                         cardsClicked: 0,
                         points: 0,
                     }, 
@@ -30,13 +30,13 @@ export default class MemoryMatch extends GameComponent {
     }
     onSessionDataChanged(data){
         //takes database info to update
-        this.setState({
-            turn: data.currentPlayer,
-        })
-
+          this.setState({
+              turn: data.currentPlayer,
+          })
     }
     userAction(){
         //user clicks cards
+       
       
     }
     stopClick(){
@@ -72,14 +72,40 @@ export default class MemoryMatch extends GameComponent {
     }
     this.getSessionDatabaseRef().set(gameData);
   }  
+  cardsFlipped(index){
+    const newcardsFlipped = this.setstate.cards.cardsFlipped;
+    newcardsFlipped[index]=!newcardsFlipped[index];
+    this.set.state ({
+      cards:{
+          
+    
+      },
+      cardsFlipped: newcardsFlipped,
+    
+      });
+    
+    };
 
   render(){
-    var id = this.getSessionId();
+    /*var id = this.getSessionId();
     var users = this.getSessionUserIds().map((user_id) => (
       <li key={user_id}>{user_id}</li>
     ));
     var creatorId = UserApi.getName(this.getSessionCreatorUserId());
-    var userName = this.getMyUserId();
+    var userName = this.getMyUserId();*/
+    
+  //Change the Button to a show a different name when clicked
+  var displayCard = this.state.cards.cardsValue.map((cardName, index) => {
+    if(this.state.cardsFlipped[index]){
+      return cardName;
+    }
+  return "";
+  });
+  var buttons = cardDisplay.map((name, i) =>(
+    <button onClick={this.handleButtonClick(i)}>{name}</button>
+  ));
+
+     
     return (
     //    <div>
     //      <p>Session ID: {id}</p>
@@ -93,16 +119,17 @@ export default class MemoryMatch extends GameComponent {
     //      </ul>
     //    </div>
        <div id="game">
-        <button id="buttonOne"> back </button>
-        <button id="buttonTwo"> back </button>
-        <button id="buttonThree"> back </button>
-        <button id="buttonFour"> back </button>
-        <button id="buttonFive"> back </button>
-        <button id="buttonSix"> back </button>
+        <button id="0" onClick={this.userAction(this.id)}> Back </button>
+        <button id="1" onClick={this.userAction(this.id)}> Back </button>
+        <button id="2" onClick={this.userAction(this.id)}> Back </button>
+        <button id="3" onClick={this.userAction(this.id)}> Back </button>
+        <button id="4" onClick={this.userAction(this.id)}> Back </button>
+        <button id="5" onClick={this.userAction(this.id)}> Back </button>
         <button id= "reset" onClick={this.newGame()}> Reset </button>
        </div>
 
     );
   }
 }
+
 
