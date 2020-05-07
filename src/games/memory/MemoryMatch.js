@@ -1,16 +1,46 @@
 import GameComponent from '../../GameComponent.js';
 import React from 'react';
 import UserApi from '../../UserApi.js'
+import './MemoryMatch.css';
 
 export default class MemoryMatch extends GameComponent {
     constructor(props){
         super(props);
         this.state = {
-                turn: "player1",
-                cards: {
-                    cardsValue: ["cake", "dog", "cake", "pen", "pen", "dog"],  
-                    cardsFlipped: [false, false, false, false, false, false],
-                },
+                turn: "1",
+                cardsSaved:[],
+                cards: [
+                  {
+                    value:"cake",
+                    flipped: false,
+                    text: "back"
+                  },
+                  {
+                    value:"pen",
+                    flipped: false,
+                    text: "back"
+                  },
+                  {
+                    value:"pen",
+                    flipped: false,
+                    text: "back"
+                  },
+                  {
+                    value:"dog",
+                    flipped: false,
+                    text: "back"
+                  },
+                  {
+                    value:"cake",
+                    flipped: false,
+                    text: "back"
+                  },
+                  {
+                    value:"dog",
+                    flipped: false,
+                    text: "back"
+                  },
+                ],
                 players:{
                       player1:{
                         id: this.getSessionCreatorUserId(),
@@ -34,25 +64,49 @@ export default class MemoryMatch extends GameComponent {
               turn: data.currentPlayer,
           })
     }
-    userAction(){
+    userAction = (id, object) => {
         //user clicks cards
-       
-      
+        const {cards} = this.state;
+        let cardsCopy = [...cards];
+          cardsCopy[id].flipped = !cardsCopy[id].flipped;
+          //if cards are flipped show front else show back
+           if(cards[id].flipped === false){
+            cardsCopy[id].text = "back";
+          } else if(cards[id].flipped === true){
+            cardsCopy[id].text = cardsCopy[id].value;
+          }
+          //set state + checkCards
+          this.setState({
+            cards: cardsCopy,
+            cardsSaved: this.state.cardsSaved.concat(cardsCopy[id])
+          },() => this.checkCards())
+        console.log(this.state.cardsSaved.length);
+        console.log(this.state.cardsSaved)
     }
     stopClick(){
-        var buttons = this.state.cardsValue.map((state, i) => (
-        <button
+        var buttons = this.state.cards.cardsValue.map((state, i) => (
+        <button>
             disabled={!this.isMyTurn() || state !== "gone"}
             onClick={() => this.handleButtonClick(i)}>
           {state}
         </button>
         ));
     }
-   /* cardsClicked(){
-        if(cardsFlipped === 2){
-            this.state.turn = data.currentplayer;
-        }
-    }*/
+   checkCards(index){
+    let cards = this.state.cardsSaved;
+    if (cards.length === 2){
+      console.log("two reached");
+      //disable buttons  
+      //check if card values match
+      if(cards[0].value === cards[1].value){
+      console.log("value match");
+      //have two cards disable and + 1 point
+      } else {
+      //have two cards turn back around
+      }
+      //eggs
+    }
+   }
   newGame(){
       var gameData = {
         cards: {
@@ -95,37 +149,51 @@ export default class MemoryMatch extends GameComponent {
     var userName = this.getMyUserId();*/
     
   //Change the Button to a show a different name when clicked
-  var displayCard = this.state.cards.cardsValue.map((cardName, index) => {
-    if(this.state.cardsFlipped[index]){
-      return cardName;
-    }
-  return "";
-  });
-  var buttons = cardDisplay.map((name, i) =>(
-    <button onClick={this.handleButtonClick(i)}>{name}</button>
-  ));
+  // var displayCard = this.state.cards.cardsValue.map((cardName, index) => {
+  //    if(this.state.cardsFlipped[index]){
+  //      return cardName;
+  //    }
+  // return "";
+  // });
+  const handleClick = e => this.userAction(e.target.id);
+   var buttons = this.state.cards.map((object, index) => (
+     <button className="card" id={index} onClick={() => this.userAction(index, object)}>{object.text}</button>
+   ));
 
-     
+
+    
     return (
     //    <div>
     //      <p>Session ID: {id}</p>
     //      <p>Session creator: {creatorId}</p>
     //      <p>Session users:</p>
     //      <p>User name: {userName}</p>
-    //      <p>Photo URL:{UserApi.getPhotoUrl()} </p>
+    //      <p>Photo URL:{UserApi.getPhotoUrl()} </p>s
     //      <p>User sign in: {UserApi.getLastSignIn()}</p>
     //      <ul>
     //        {users}
     //      </ul>
     //    </div>
-       <div id="game">
-        <button id="0" onClick={this.userAction(this.id)}> Back </button>
-        <button id="1" onClick={this.userAction(this.id)}> Back </button>
-        <button id="2" onClick={this.userAction(this.id)}> Back </button>
-        <button id="3" onClick={this.userAction(this.id)}> Back </button>
-        <button id="4" onClick={this.userAction(this.id)}> Back </button>
-        <button id="5" onClick={this.userAction(this.id)}> Back </button>
-        <button id= "reset" onClick={this.newGame()}> Reset </button>
+   
+       <div className="game">
+         <div><p>Player {this.state.turn}'s Turn</p></div>
+          {buttons}
+          
+         {/* <div className="cards">
+           <div className="topHalf">
+              <button className="card" id="0" onClick={handleClick}> {this.state.cards[0].current} </button>
+              <button className="card" id="1" onClick={handleClick}> {this.state.text} </button>
+              <button className="card" id="2" onClick={handleClick}> {this.state.text} </button>
+            </div>
+            <div className="bottomHalf">
+              <button className="card" id="3" onClick={handleClick}> {this.state.text} </button>
+              <button className="card" id="4" onClick={handleClick}> {this.state.text} </button>
+              <button className="card" id="5" onClick={handleClick}> {this.state.text} </button>
+            </div>
+          </div> */}
+          <div className="controls">
+            <button id="reset" onClick={this.newGame()}> Reset </button>
+          </div>
        </div>
 
     );
