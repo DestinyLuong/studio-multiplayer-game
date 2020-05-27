@@ -100,8 +100,8 @@ export default class MemoryMatch extends GameComponent {
         //user clicks cards
         const {cards} = this.state;
         let cardsCopy = [...cards];
-        //check if all flipped
         this.endGame(cardsCopy);
+        //check if all flipped
           //if cards are flipped show front else show back
           if(cards[id].paired === true){
             console.log("paired");
@@ -122,19 +122,20 @@ export default class MemoryMatch extends GameComponent {
         // console.log(this.state.cardsSaved)
        }
     }
-    cardsMatch(player,cardsSv, playerCopy, cardsCopy){
+    cardsMatch(player, cardsSv, playerCopy, cardsCopy){
+      //doesn't run
       if(cardsSv[0].value === cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
         console.log("value match"); 
-        console.log("working");
-        playerCopy[player].points = playerCopy[player].points + 1;
-        console.log(playerCopy[player].points);
+        debugger;
         for(let i = 0; i < cardsCopy.length; i++){
           for(let j = 0; j < cardsSv.length; j++){
             if(cardsCopy[i].value === cardsSv[j].value){
               cardsCopy[i].paired = true;
+              console.log(cardsCopy[i].paired);
             } 
           }
         } 
+
         //just try to flip back the third card whenever possible
         cardsSv[2].flipped = false;
         this.setState({
@@ -156,7 +157,7 @@ export default class MemoryMatch extends GameComponent {
         playerCopy[1].turn = false;
         playerCopy[0].turn = true;
       }
-
+        cardsSv[2].flipped = false;
       this.setState({
         cards: cardsCopy,
         players: playerCopy,
@@ -164,7 +165,6 @@ export default class MemoryMatch extends GameComponent {
         cardsClicked: 0,
       })
       console.log(this.state.cardsSaved);
-    
     }
    checkCards(id, object, players){
     const {cards} = this.state;
@@ -181,12 +181,20 @@ export default class MemoryMatch extends GameComponent {
     }else if (cardsSv.length === 2 && cardsSv[0].value === cardsSv[1].value){
       cardsSv[0].paired = true;
       cardsSv[1].paired = true;
+        if(playerCopy[0].turn === true){
+          playerCopy[0].points = playerCopy[0].points + 1;
+          console.log(playerCopy[0].points);
+        } else if (playerCopy[1].turn ===  true){
+          playerCopy[1].points = playerCopy[1].points + 1;
+          console.log(playerCopy[1].points);
+        } 
       this.setState({
         cards: cardsCopy,
         players: playerCopy,
         cardsSaved: [],
         cardsClicked: 0,
       })
+      console.log(this.state.players);
     }
   }
    endGame(cardsCopy){
@@ -227,7 +235,7 @@ export default class MemoryMatch extends GameComponent {
       cardsCopy[m].back = "https://i.imgur.com/w3S558P.png";
     } 
     playerCopy[0].turn = true;
-    playerCopy[0].turn = false;
+    playerCopy[1].turn = false;
     this.setState({
       seen: false,
       cardsSaved: [],
@@ -317,7 +325,7 @@ export default class MemoryMatch extends GameComponent {
     {this.state.seen ? <div className="popUp">
       <p className="endInfo">Game Finished!</p>
       <p>Player 1's Points {this.state.players[0].points}</p>
-      <p>Player 2's Points {this.state.players[0].points}</p>
+      <p>Player 2's Points {this.state.players[1].points}</p>
       <button id="reset" onClick={() => this.newGame()}> Reset </button>
       </div> : null}
           {cards}
