@@ -9,6 +9,7 @@ export default class MemoryMatch extends GameComponent {
         super(props);
         this.state = {
                 cardsSaved:[],
+                cardsClicked: 0,
                 cards: [
                   {
                     value: "https://i.imgur.com/gASpgkp.png",
@@ -74,13 +75,11 @@ export default class MemoryMatch extends GameComponent {
                 players:[
                   {
                     id: this.getSessionCreatorUserId(),
-                    cardsClicked: 0,
                     points: 0,
                     turn: true
                    }, 
                   {
                     id:  this.getSessionUserIds(),
-                    cardsClicked: 0,
                     points: 0,
                     turn: false
                   }, 
@@ -100,11 +99,11 @@ export default class MemoryMatch extends GameComponent {
         //user clicks cards
         const {cards} = this.state;
         let cardsCopy = [...cards];
-        cardsCopy[id].flipped = !cardsCopy[id].flipped;
           //if cards are flipped show front else show back
           if(cards[id].paired === true){
-
+            console.log("paired");
           } else {
+            cardsCopy[id].flipped = !cardsCopy[id].flipped;
             if(cards[id].flipped === false){
             cardsCopy[id].back = "https://i.imgur.com/w3S558P.png";
             } else if(cards[id].flipped === true){
@@ -113,6 +112,7 @@ export default class MemoryMatch extends GameComponent {
           //set state + checkCards
           this.setState({
             cards: cardsCopy,
+            cardsClicked: this.state.cardsClicked + 1,
             cardsSaved: this.state.cardsSaved.concat(cardsCopy[id])
           },() => this.checkCards(id, object, players))
         // console.log(this.state.cardsSaved.length);
@@ -121,25 +121,27 @@ export default class MemoryMatch extends GameComponent {
     }
    
    checkCards(id, object, players){
-    const {cards} = this.state;
-    let cardsCopy = [...cards];
-    let cardsSv = this.state.cardsSaved;
-    let playerCopy = players;
-      if (cardsSv.length === 3){
+     const {cards} = this.state;
+     let cardsCopy = [...cards];
+     let cardsSv = this.state.cardsSaved;
+     let playerCopy = players;
+     if(cardsSv.length === 3){
       console.log("two reached"); 
-      //check if card values match only if they are flipped
       if(playerCopy[0].turn === true){
-
-      console.log(playerCopy[0].turn);
-     // + 1 point
+        //check if card values match only if they are flipped
         if(cardsSv[0].value === cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
           console.log("value match");
+          // + 1 point
           playerCopy[0].points = playerCopy[0].points + 1;
-          //cardsCopy = cardsSv[]
-          this.setState({
-            cards: cardsCopy,
-            players: playerCopy
-          })
+          for(let i = 0; i < cardsCopy.length; i++){
+            for(let j = 0; j < cardsSv.length; j++){
+              if(cardsCopy[i].value === cardsSv[j].value){
+                cardsCopy[i].paired = true;
+              } 
+            }
+          } 
+          //just try to flip back the third card whenever possible
+          cardsSv[2].flipped = false;
         } else if (cardsSv[0].value !== cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
           for(let i = 0; i < cardsCopy.length; i++){
             for(let j = 0; j < cardsSv.length; j++){
@@ -154,15 +156,23 @@ export default class MemoryMatch extends GameComponent {
         playerCopy[1].turn = true;
         this.setState({
           cards: cardsCopy,
-          cardsSaved: []
+          players: playerCopy,
+          cardsSaved: [],
+          cardsClicked: 0,
         })
         console.log(this.state.cardsSaved);
     } else if (playerCopy[1].turn ===  true){
         if(cardsSv[0].value === cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
           playerCopy[1].points = playerCopy[1].points + 1;
-          this.setState({
-            players: playerCopy
-          })
+          for(let i = 0; i < cardsCopy.length; i++){
+            for(let j = 0; j < cardsSv.length; j++){
+              if(cardsCopy[i].value === cardsSv[j].value){
+                cardsCopy[i].paired = true;
+              } 
+            }
+          }
+          //just try to flip back the third card whenever possible
+          cardsSv[2].flipped = false;
         } else if (cardsSv[0].value !== cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
           for(let i = 0; i < cardsCopy.length; i++){
             for(let j = 0; j < cardsSv.length; j++){
@@ -173,14 +183,20 @@ export default class MemoryMatch extends GameComponent {
             }
           }
         }
-          playerCopy[1].turn = false;
-          playerCopy[0].turn = true;
-          this.setState({
-            cards: cardsCopy,
-            cardsSaved: []
-          })
+        playerCopy[1].turn = false;
+        playerCopy[0].turn = true;
+        this.setState({
+          cards: cardsCopy,
+          cardsSaved: [],
+          players: playerCopy,
+          cardsClicked: 0,
+        })
       } 
-     }
+    }
+  }
+   endTurn(){
+
+     //return(<button>End Turn</button>);
    }
    stopClick(){
     var buttons = this.state.cards.cardsValue.map((state, i) => (
