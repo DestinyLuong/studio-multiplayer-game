@@ -124,9 +124,9 @@ export default class MemoryMatch extends GameComponent {
     }
     cardsMatch(player,cardsSv, playerCopy, cardsCopy){
       if(cardsSv[0].value === cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
-        console.log("value match");
+        console.log("value match"); 
+        console.log("working");
         playerCopy[player].points = playerCopy[player].points + 1;
-        debugger;
         console.log(playerCopy[player].points);
         for(let i = 0; i < cardsCopy.length; i++){
           for(let j = 0; j < cardsSv.length; j++){
@@ -137,6 +137,12 @@ export default class MemoryMatch extends GameComponent {
         } 
         //just try to flip back the third card whenever possible
         cardsSv[2].flipped = false;
+        this.setState({
+          cards: cardsCopy,
+          players: playerCopy,
+          cardsSaved: [],
+          cardsClicked: 0,
+        })
       } else {
         cardsSv.forEach((v) => {
           v.back = "https://i.imgur.com/w3S558P.png";
@@ -208,24 +214,29 @@ export default class MemoryMatch extends GameComponent {
     ));
 }
   newGame(){
-      var gameData = {
-        cards: {
-            cardsValue: [], 
-            cardsFlipped: [],
-        },
-        players:{
-              player1:{
-                  cardsClicked: 0,
-                  points: 0,
-              }, 
-              player2:{
-                cardsClicked: 0,
-                points: 0,
-            }, 
-      }
-    }
-    this.getSessionDatabaseRef().set(gameData);
-  }  
+  //   this.getSessionDatabaseRef().set(gameData);
+    const {cards} = this.state;
+    let cardsCopy = [...cards];
+    let playerCopy = this.state.players;
+    for(let l = 0; l < playerCopy.length; l++){
+      playerCopy[l].points = 0;
+    } 
+    for(let m = 0; m < cardsCopy.length; m++){
+      cardsCopy[m].paired = false;
+      cardsCopy[m].flipped = false;
+      cardsCopy[m].back = "https://i.imgur.com/w3S558P.png";
+    } 
+    playerCopy[0].turn = true;
+    playerCopy[0].turn = false;
+    this.setState({
+      seen: false,
+      cardsSaved: [],
+      cardsClicked: 0,
+      cards: cardsCopy,
+      players: playerCopy,
+    })
+
+   }  
   randomizeCards(array){
       //randomize cards before loading 
       // let newArray = array.sort(() => 0.5 - Math.random());
@@ -307,7 +318,7 @@ export default class MemoryMatch extends GameComponent {
       <p className="endInfo">Game Finished!</p>
       <p>Player 1's Points {this.state.players[0].points}</p>
       <p>Player 2's Points {this.state.players[0].points}</p>
-      <button id="reset" onClick={this.newGame()}> Reset </button>
+      <button id="reset" onClick={() => this.newGame()}> Reset </button>
       </div> : null}
           {cards}
           </div>
