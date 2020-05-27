@@ -228,18 +228,19 @@ export default class MemoryMatch extends GameComponent {
     for(let l = 0; l < playerCopy.length; l++){
       playerCopy[l].points = 0;
     } 
+    playerCopy[0].turn = true;
+    playerCopy[1].turn = false;
     for(let m = 0; m < cardsCopy.length; m++){
       cardsCopy[m].paired = false;
       cardsCopy[m].flipped = false;
       cardsCopy[m].back = "https://i.imgur.com/w3S558P.png";
     } 
-    playerCopy[0].turn = true;
-    playerCopy[1].turn = false;
+    let newDeck = this.randomizeCards(cardsCopy);
     this.setState({
       seen: false,
       cardsSaved: [],
       cardsClicked: 0,
-      cards: cardsCopy,
+      cards: newDeck,
       players: playerCopy,
     })
    } 
