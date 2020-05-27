@@ -7,7 +7,6 @@ export default class MemoryMatch extends GameComponent {
     constructor(props){
         super(props);
         this.state = {
-                turn: "1",
                 cardsSaved:[],
                 cards: [
                   {
@@ -41,18 +40,20 @@ export default class MemoryMatch extends GameComponent {
                     text: "back"
                   },
                 ],
-                players:{
-                      player1:{
-                        id: this.getSessionCreatorUserId(),
-                        cardsClicked: 0,
-                        points: 0,
-                      }, 
-                      player2:{
-                        id:  this.getSessionUserIds(),
-                        cardsClicked: 0,
-                        points: 0,
-                    }, 
-              }
+                players:[
+                  {
+                    id: this.getSessionCreatorUserId(),
+                    cardsClicked: 0,
+                    points: 0,
+                    turn: true
+                   }, 
+                  {
+                    id:  this.getSessionUserIds(),
+                    cardsClicked: 0,
+                    points: 0,
+                    turn: false
+                  }, 
+                ]
             }
     }
     getOtherSessionUserID(){
@@ -64,13 +65,13 @@ export default class MemoryMatch extends GameComponent {
               turn: data.currentPlayer,
           })
     }
-    userAction = (id, object) => {
+    userAction = (id, object, players) => {
         //user clicks cards
         const {cards} = this.state;
         let cardsCopy = [...cards];
-          cardsCopy[id].flipped = !cardsCopy[id].flipped;
+        cardsCopy[id].flipped = !cardsCopy[id].flipped;
           //if cards are flipped show front else show back
-           if(cards[id].flipped === false){
+          if(cards[id].flipped === false){
             cardsCopy[id].text = "back";
           } else if(cards[id].flipped === true){
             cardsCopy[id].text = cardsCopy[id].value;
@@ -79,9 +80,9 @@ export default class MemoryMatch extends GameComponent {
           this.setState({
             cards: cardsCopy,
             cardsSaved: this.state.cardsSaved.concat(cardsCopy[id])
-          },() => this.checkCards())
-        console.log(this.state.cardsSaved.length);
-        console.log(this.state.cardsSaved)
+          },() => this.checkCards(players))
+        // console.log(this.state.cardsSaved.length);
+        // console.log(this.state.cardsSaved)
     }
     stopClick(){
         var buttons = this.state.cards.cardsValue.map((state, i) => (
@@ -92,19 +93,47 @@ export default class MemoryMatch extends GameComponent {
         </button>
         ));
     }
-   checkCards(index){
+   checkCards(players){
     let cards = this.state.cardsSaved;
+    // const {players} = this.state;
+    // const {turn} = this.state;
+    // let playerTurn = turn;
+    let playerCopy = players;
     if (cards.length === 2){
-      console.log("two reached");
-      //disable buttons  
-      //check if card values match
-      if(cards[0].value === cards[1].value){
+      console.log("two reached"); 
+      //check if card values match only if they are flipped
+      if(cards[0].value === cards[1].value && cards[0].flipped && cards[1].flipped){
       console.log("value match");
-      //have two cards disable and + 1 point
+      console.log(playerCopy[0].turn);
+     // + 1 point
+        if(playerCopy[0].turn === true){
+          playerCopy.points = playerCopy[0].points + 1;
+          playerCopy[0].turn = false;
+          playerCopy[1].turn = true;
+          this.setState({
+            cardsSaved: [],
+            players: playerCopy
+          })
+        } else if (playerCopy[1].turn ===  true){
+          playerCopy.points = playerCopy[1].points + 1;
+          playerCopy[1].turn = false;
+          playerCopy[0].turn = true;
+          this.setState({
+            cardsSaved: [],
+            players: playerCopy
+          })
+        }
+    
       } else {
       //have two cards turn back around
       }
-      //eggs
+      //wipe cardsSaved
+      this.setState({
+        cardsSaved: []
+      })
+    } else if(cards.length > 2){
+      // disable buttons and flips the rest over
+      
     }
    }
   newGame(){
@@ -126,6 +155,25 @@ export default class MemoryMatch extends GameComponent {
     }
     this.getSessionDatabaseRef().set(gameData);
   }  
+  randomizeCards(array){
+      //randomize cards before loading 
+      // let newArray = array.sort(() => 0.5 - Math.random());
+      // return newArray;
+      var ctr = array.length, temp, index;
+
+      // While there are elements in the array
+          while (ctr > 0) {
+      // Pick a random index
+              index = Math.floor(Math.random() * ctr);
+      // Decrease ctr by 1
+              ctr--;
+      // And swap the last element with it
+              temp = array[ctr];
+              array[ctr] = array[index];
+              array[index] = temp;
+          }
+          return array;
+  }
   cardsFlipped(index){
     const newcardsFlipped = this.setstate.cards.cardsFlipped;
     newcardsFlipped[index]=!newcardsFlipped[index];
@@ -155,9 +203,12 @@ export default class MemoryMatch extends GameComponent {
   //    }
   // return "";
   // });
-  const handleClick = e => this.userAction(e.target.id);
+
+ 
+ 
+  //const handleClick = e => this.userAction(e.target.id);
    var buttons = this.state.cards.map((object, index) => (
-     <button className="card" id={index} onClick={() => this.userAction(index, object)}>{object.text}</button>
+     <button className="card" id={index} onClick={() => this.userAction(index, object, this.state.players)}>{object.text}</button>
    ));
 
 
@@ -176,7 +227,7 @@ export default class MemoryMatch extends GameComponent {
     //    </div>
    
        <div className="game">
-         <div><p>Player {this.state.turn}'s Turn</p></div>
+         <p></p>
           {buttons}
           
          {/* <div className="cards">
@@ -198,6 +249,55 @@ export default class MemoryMatch extends GameComponent {
 
     );
   }
+}
+class RenderOnce extends React.Component {
+    state = {
+      cards: [
+        {
+          value:"cake",
+          flipped: false,
+          text: "back"
+        },
+        {
+          value:"pen",
+          flipped: false,
+          text: "back"
+        },
+        {
+          value:"pen",
+          flipped: false,
+          text: "back"
+        },
+        {
+          value:"dog",
+          flipped: false,
+          text: "back"
+        },
+        {
+          value:"cake",
+          flipped: false,
+          text: "back"
+        },
+        {
+          value:"dog",
+          flipped: false,
+          text: "back"
+        },
+      ],
+    };
+    randomizeCards(array){
+      const {cards} = this.state;
+      let cardsCopy = [...cards];
+      cardsCopy = this.randomizeCards(cardsCopy);
+      console.log(cardsCopy);
+      this.setState({
+        cards: cardsCopy,
+      })
+    }
+    render() {
+      this.randomizeCards(this.state.cards);
+      return;
+    }
 }
 
 
