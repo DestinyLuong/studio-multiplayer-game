@@ -2,6 +2,7 @@ import GameComponent from '../../GameComponent.js';
 import React from 'react';
 import UserApi from '../../UserApi.js'
 import './MemoryMatch.css';
+import { ActionThumbsUpDown } from 'material-ui/svg-icons';
 
 export default class MemoryMatch extends GameComponent {
     constructor(props){
@@ -25,12 +26,32 @@ export default class MemoryMatch extends GameComponent {
                     text: "back"
                   },
                   {
-                    value:"dog",
+                    value:"book",
                     flipped: false,
                     text: "back"
                   },
                   {
                     value:"cake",
+                    flipped: false,
+                    text: "back"
+                  },
+                  {
+                    value:"bone",
+                    flipped: false,
+                    text: "back"
+                  },
+                  {
+                    value:"bone",
+                    flipped: false,
+                    text: "back"
+                  },
+                  {
+                    value:"book",
+                    flipped: false,
+                    text: "back"
+                  },
+                  {
+                    value:"dog",
                     flipped: false,
                     text: "back"
                   },
@@ -80,7 +101,7 @@ export default class MemoryMatch extends GameComponent {
           this.setState({
             cards: cardsCopy,
             cardsSaved: this.state.cardsSaved.concat(cardsCopy[id])
-          },() => this.checkCards(players))
+          },() => this.checkCards(id, object, players))
         // console.log(this.state.cardsSaved.length);
         // console.log(this.state.cardsSaved)
     }
@@ -93,7 +114,7 @@ export default class MemoryMatch extends GameComponent {
         </button>
         ));
     }
-   checkCards(players){
+   checkCards(id, object, players){
     let cards = this.state.cardsSaved;
     // const {players} = this.state;
     // const {turn} = this.state;
@@ -102,30 +123,41 @@ export default class MemoryMatch extends GameComponent {
     if (cards.length === 2){
       console.log("two reached"); 
       //check if card values match only if they are flipped
-      if(cards[0].value === cards[1].value && cards[0].flipped && cards[1].flipped){
+      if(playerCopy[0].turn === true){
       console.log("value match");
       console.log(playerCopy[0].turn);
      // + 1 point
-        if(playerCopy[0].turn === true){
-          playerCopy.points = playerCopy[0].points + 1;
-          playerCopy[0].turn = false;
-          playerCopy[1].turn = true;
-          this.setState({
-            cardsSaved: [],
-            players: playerCopy
-          })
-        } else if (playerCopy[1].turn ===  true){
-          playerCopy.points = playerCopy[1].points + 1;
-          playerCopy[1].turn = false;
-          playerCopy[0].turn = true;
+        if(cards[0].value === cards[1].value && cards[0].flipped && cards[1].flipped){
+          playerCopy[0].points = playerCopy[0].points + 1;
           this.setState({
             cardsSaved: [],
             players: playerCopy
           })
         }
-    
+        playerCopy[0].turn = false;
+        playerCopy[1].turn = true;
+      } else if (playerCopy[1].turn ===  true){
+        if(cards[0].value === cards[1].value && cards[0].flipped && cards[1].flipped){
+          playerCopy[1].points = playerCopy[1].points + 1;
+          this.setState({
+            cardsSaved: [],
+            players: playerCopy
+          })
+        }
+          playerCopy[1].turn = false;
+          playerCopy[0].turn = true;
       } else {
       //have two cards turn back around
+      // const {cards} = this.state;
+      //   let cardsCopy = [...cards];
+      // cardsCopy[id].flipped = !cardsCopy[id].flipped;
+      
+      // //if cards are flipped show front else show back
+      // if(cards[id].flipped === false){
+      //   cardsCopy[id].text = "back";
+      // } else if(cards[id].flipped === true){
+      //   cardsCopy[id].text = cardsCopy[id].value;
+      // }
       }
       //wipe cardsSaved
       this.setState({
@@ -210,6 +242,17 @@ export default class MemoryMatch extends GameComponent {
    var buttons = this.state.cards.map((object, index) => (
      <button className="card" id={index} onClick={() => this.userAction(index, object, this.state.players)}>{object.text}</button>
    ));
+   var playerTurn;
+   var playerPoints;
+   if(this.state.players[0].turn === true){
+      playerTurn = 1;
+      playerPoints = this.state.players[0].points;
+
+   } else if (this.state.players[1].turn === true){
+      playerTurn = 2;
+      playerPoints = this.state.players[1].points;
+   }
+   
 
 
     
@@ -227,7 +270,9 @@ export default class MemoryMatch extends GameComponent {
     //    </div>
    
        <div className="game">
-         <p></p>
+         <p>Player {playerTurn}'s Turn</p>
+        <p>Player {playerTurn}'s Points: {playerPoints}</p>
+          
           {buttons}
           
          {/* <div className="cards">
