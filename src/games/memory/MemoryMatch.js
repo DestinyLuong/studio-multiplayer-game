@@ -2,7 +2,7 @@ import GameComponent from '../../GameComponent.js';
 import React from 'react';
 import UserApi from '../../UserApi.js'
 import './MemoryMatch.css';
-import { ActionThumbsUpDown } from 'material-ui/svg-icons';
+//import { ActionThumbsUpDown } from 'material-ui/svg-icons';
 
 export default class MemoryMatch extends GameComponent {
     constructor(props){
@@ -13,52 +13,62 @@ export default class MemoryMatch extends GameComponent {
                   {
                     value: "https://i.imgur.com/gASpgkp.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                   {
                     value:"https://i.imgur.com/XUPZl8x.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                   {
                     value:"https://i.imgur.com/gASpgkp.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                   {
                     value:"https://i.imgur.com/MI8YIEK.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                   {
                     value:"https://i.imgur.com/XUPZl8x.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                   {
                     value:"https://i.imgur.com/4orjKPo.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                   {
                     value:"https://i.imgur.com/PGI3lbv.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                   {
                     value:"https://i.imgur.com/PGI3lbv.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                   {
                     value:"https://i.imgur.com/MI8YIEK.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                   {
                     value:"https://i.imgur.com/4orjKPo.png",
                     flipped: false,
-                    back: "https://i.imgur.com/w3S558P.png"
+                    back: "https://i.imgur.com/w3S558P.png",
+                    paired: false,
                   },
                 ],
                 players:[
@@ -92,11 +102,14 @@ export default class MemoryMatch extends GameComponent {
         let cardsCopy = [...cards];
         cardsCopy[id].flipped = !cardsCopy[id].flipped;
           //if cards are flipped show front else show back
-          if(cards[id].flipped === false){
+          if(cards[id].paired === true){
+
+          } else {
+            if(cards[id].flipped === false){
             cardsCopy[id].back = "https://i.imgur.com/w3S558P.png";
-          } else if(cards[id].flipped === true){
+            } else if(cards[id].flipped === true){
             cardsCopy[id].back = cardsCopy[id].value;
-          }
+            }
           //set state + checkCards
           this.setState({
             cards: cardsCopy,
@@ -104,68 +117,80 @@ export default class MemoryMatch extends GameComponent {
           },() => this.checkCards(id, object, players))
         // console.log(this.state.cardsSaved.length);
         // console.log(this.state.cardsSaved)
+       }
     }
-    stopClick(){
-        var buttons = this.state.cards.cardsValue.map((state, i) => (
-        <button>
-            disabled={!this.isMyTurn() || state !== "gone"}
-            onClick={() => this.handleButtonClick(i)}>
-          {state}
-        </button>
-        ));
-    }
+   
    checkCards(id, object, players){
-    let cards = this.state.cardsSaved;
-    // const {players} = this.state;
-    // const {turn} = this.state;
-    // let playerTurn = turn;
+    const {cards} = this.state;
+    let cardsCopy = [...cards];
+    let cardsSv = this.state.cardsSaved;
     let playerCopy = players;
-    if (cards.length === 2){
+      if (cardsSv.length === 3){
       console.log("two reached"); 
       //check if card values match only if they are flipped
       if(playerCopy[0].turn === true){
-      console.log("value match");
+
       console.log(playerCopy[0].turn);
      // + 1 point
-        if(cards[0].value === cards[1].value && cards[0].flipped && cards[1].flipped){
+        if(cardsSv[0].value === cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
+          console.log("value match");
           playerCopy[0].points = playerCopy[0].points + 1;
+          //cardsCopy = cardsSv[]
           this.setState({
-            cardsSaved: [],
+            cards: cardsCopy,
             players: playerCopy
           })
+        } else if (cardsSv[0].value !== cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
+          for(let i = 0; i < cardsCopy.length; i++){
+            for(let j = 0; j < cardsSv.length; j++){
+              if(cardsCopy[i].value === cardsSv[j].value){
+                cardsCopy[i].flipped = !cardsCopy[i].flipped;
+                cardsCopy[i].back = "https://i.imgur.com/w3S558P.png";
+              } 
+            }
+          }
         }
         playerCopy[0].turn = false;
         playerCopy[1].turn = true;
-      } else if (playerCopy[1].turn ===  true){
-        if(cards[0].value === cards[1].value && cards[0].flipped && cards[1].flipped){
+        this.setState({
+          cards: cardsCopy,
+          cardsSaved: []
+        })
+        console.log(this.state.cardsSaved);
+    } else if (playerCopy[1].turn ===  true){
+        if(cardsSv[0].value === cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
           playerCopy[1].points = playerCopy[1].points + 1;
           this.setState({
-            cardsSaved: [],
             players: playerCopy
           })
+        } else if (cardsSv[0].value !== cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
+          for(let i = 0; i < cardsCopy.length; i++){
+            for(let j = 0; j < cardsSv.length; j++){
+              if(cardsCopy[i].value === cardsSv[j].value){
+                cardsCopy[i].flipped = !cardsCopy[i].flipped;
+                cardsCopy[i].back = "https://i.imgur.com/w3S558P.png";
+              } 
+            }
+          }
         }
           playerCopy[1].turn = false;
           playerCopy[0].turn = true;
-      } else {
-      //have two cards turn back around
-      const {cards} = this.state;
-         let cardsCopy = [...cards];
-       cardsCopy[id].flipped = !cardsCopy[id].flipped;
-      // if(cards[id].flipped === false){
-      //   cardsCopy[id].back = "back";
-      // } else if(cards[id].flipped === true){
-      //   cardsCopy[id].back = cardsCopy[id].value;
-      // }
-      }
-      //wipe cardsSaved
-      this.setState({
-        cardsSaved: []
-      })
-    } else if(cards.length > 2){
-      // disable buttons and flips the rest over
-      
-    }
+          this.setState({
+            cards: cardsCopy,
+            cardsSaved: []
+          })
+      } 
+     }
    }
+   stopClick(){
+    var buttons = this.state.cards.cardsValue.map((state, i) => (
+    <button>
+        disabled={!this.isMyTurn() || state !== "gone"}
+        onClick={() => this.handleButtonClick(i)}>
+      {state}
+    </button>
+    ));
+}
   newGame(){
       var gameData = {
         cards: {
