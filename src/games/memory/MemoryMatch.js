@@ -83,7 +83,8 @@ export default class MemoryMatch extends GameComponent {
                     points: 0,
                     turn: false
                   }, 
-                ]
+                ],
+                seen: false
             }
     }
     getOtherSessionUserID(){
@@ -99,6 +100,8 @@ export default class MemoryMatch extends GameComponent {
         //user clicks cards
         const {cards} = this.state;
         let cardsCopy = [...cards];
+        //check if all flipped
+        this.endGame(cardsCopy);
           //if cards are flipped show front else show back
           if(cards[id].paired === true){
             console.log("paired");
@@ -119,85 +122,82 @@ export default class MemoryMatch extends GameComponent {
         // console.log(this.state.cardsSaved)
        }
     }
-   
-   checkCards(id, object, players){
-     const {cards} = this.state;
-     let cardsCopy = [...cards];
-     let cardsSv = this.state.cardsSaved;
-     let playerCopy = players;
-     if(cardsSv.length === 3){
-      console.log("two reached"); 
-      if(playerCopy[0].turn === true){
-        //check if card values match only if they are flipped
-        if(cardsSv[0].value === cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
-          console.log("value match");
-          // + 1 point
-          playerCopy[0].points = playerCopy[0].points + 1;
-          for(let i = 0; i < cardsCopy.length; i++){
-            for(let j = 0; j < cardsSv.length; j++){
-              if(cardsCopy[i].value === cardsSv[j].value){
-                cardsCopy[i].paired = true;
-              } 
-            }
-          } 
-          //just try to flip back the third card whenever possible
-          cardsSv[2].flipped = false;
-        } else if (cardsSv[0].value !== cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
-          for(let i = 0; i < cardsCopy.length; i++){
-            for(let j = 0; j < cardsSv.length; j++){
-              if(cardsCopy[i].value === cardsSv[j].value){
-                cardsCopy[i].flipped = !cardsCopy[i].flipped;
-                cardsCopy[i].back = "https://i.imgur.com/w3S558P.png";
-              } 
-            }
+    cardsMatch(player,cardsSv, playerCopy, cardsCopy){
+      if(cardsSv[0].value === cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
+        console.log("value match");
+        playerCopy[player].points = playerCopy[player].points + 1;
+        debugger;
+        console.log(playerCopy[player].points);
+        for(let i = 0; i < cardsCopy.length; i++){
+          for(let j = 0; j < cardsSv.length; j++){
+            if(cardsCopy[i].value === cardsSv[j].value){
+              cardsCopy[i].paired = true;
+            } 
           }
-        }
+        } 
+        //just try to flip back the third card whenever possible
+        cardsSv[2].flipped = false;
+      } else {
+        cardsSv.forEach((v) => {
+          v.back = "https://i.imgur.com/w3S558P.png";
+          v.flipped = false;
+        })
+      }
+      if (player === 0){
         playerCopy[0].turn = false;
         playerCopy[1].turn = true;
-        this.setState({
-          cards: cardsCopy,
-          players: playerCopy,
-          cardsSaved: [],
-          cardsClicked: 0,
-        })
-        console.log(this.state.cardsSaved);
-    } else if (playerCopy[1].turn ===  true){
-        if(cardsSv[0].value === cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
-          playerCopy[1].points = playerCopy[1].points + 1;
-          for(let i = 0; i < cardsCopy.length; i++){
-            for(let j = 0; j < cardsSv.length; j++){
-              if(cardsCopy[i].value === cardsSv[j].value){
-                cardsCopy[i].paired = true;
-              } 
-            }
-          }
-          //just try to flip back the third card whenever possible
-          cardsSv[2].flipped = false;
-        } else if (cardsSv[0].value !== cardsSv[1].value && cardsSv[0].flipped && cardsSv[1].flipped){
-          for(let i = 0; i < cardsCopy.length; i++){
-            for(let j = 0; j < cardsSv.length; j++){
-              if(cardsCopy[i].value === cardsSv[j].value){
-                cardsCopy[i].flipped = !cardsCopy[i].flipped;
-                cardsCopy[i].back = "https://i.imgur.com/w3S558P.png";
-              } 
-            }
-          }
-        }
+      }else{
         playerCopy[1].turn = false;
         playerCopy[0].turn = true;
-        this.setState({
-          cards: cardsCopy,
-          cardsSaved: [],
-          players: playerCopy,
-          cardsClicked: 0,
-        })
+      }
+
+      this.setState({
+        cards: cardsCopy,
+        players: playerCopy,
+        cardsSaved: [],
+        cardsClicked: 0,
+      })
+      console.log(this.state.cardsSaved);
+    
+    }
+   checkCards(id, object, players){
+    const {cards} = this.state;
+    let cardsCopy = [...cards];
+    let cardsSv = this.state.cardsSaved;
+    let playerCopy = players;
+    if(cardsSv.length === 3){
+      console.log("two reached"); 
+      if(playerCopy[0].turn === true){
+        this.cardsMatch(0, cardsSv, playerCopy, cardsCopy);
+      } else if (playerCopy[1].turn ===  true){
+        this.cardsMatch(1, cardsSv, playerCopy, cardsCopy);
       } 
+    }else if (cardsSv.length === 2 && cardsSv[0].value === cardsSv[1].value){
+      cardsSv[0].paired = true;
+      cardsSv[1].paired = true;
+      this.setState({
+        cards: cardsCopy,
+        players: playerCopy,
+        cardsSaved: [],
+        cardsClicked: 0,
+      })
     }
   }
-   endTurn(){
-
-     //return(<button>End Turn</button>);
+   endGame(cardsCopy){
+    let pairedCount = 0;
+    for(let k = 0; k < cardsCopy.length; k++){
+        if(cardsCopy[k].paired === true){
+          pairedCount = pairedCount + 1;
+        } 
+    } 
+    if(pairedCount === cardsCopy.length){
+      this.setState({
+        seen: !this.state.seen
+       });
+      return;
+    }
    }
+   
    stopClick(){
     var buttons = this.state.cards.cardsValue.map((state, i) => (
     <button>
@@ -245,19 +245,7 @@ export default class MemoryMatch extends GameComponent {
           }
           return array;
   }
-  cardsFlipped(index){
-    const newcardsFlipped = this.setstate.cards.cardsFlipped;
-    newcardsFlipped[index]=!newcardsFlipped[index];
-    this.set.state ({
-      cards:{
-          
-    
-      },
-      cardsFlipped: newcardsFlipped,
-    
-      });
-    
-    };
+
 
   render(){
     /*var id = this.getSessionId();
@@ -315,10 +303,15 @@ export default class MemoryMatch extends GameComponent {
           <p>Player {playerTurn}'s Points: {playerPoints}</p>
         </div>
         <div className="board">
+    {this.state.seen ? <div className="popUp">
+      <p className="endInfo">Game Finished!</p>
+      <p>Player 1's Points {this.state.players[0].points}</p>
+      <p>Player 2's Points {this.state.players[0].points}</p>
+      <button id="reset" onClick={this.newGame()}> Reset </button>
+      </div> : null}
           {cards}
           </div>
         <div className="controls">
-          <button id="reset" onClick={this.newGame()}> Reset </button>
           <p classname="description">*Cards made with help from ASEC*</p>
         </div>
        </div>

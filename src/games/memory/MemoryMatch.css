@@ -14,11 +14,31 @@ h1{
 }
 .board{
     text-align: center;
+    z-index: 1000;
 }
 .card{
     padding: 2%;
+    text-align: center;
     width: 15%
 }
 .controls{
     text-align: center
+}
+.popUp{
+    position: absolute;
+    z-index: 1001;
+    background: white;
+    display: inline-block;
+    padding: 5% 10% 5% 10%;
+    right: 30%;
+    left: 30%;
+    top: 40%;
+    text-align: center;
+    border-radius: 25px;
+    box-shadow: 3px 3px;
+}
+.endInfo{
+    text-align: center;
+    padding: 5%;
+    font-weight: bold;
 }
