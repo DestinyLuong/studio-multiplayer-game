@@ -211,7 +211,6 @@ export default class MemoryMatch extends GameComponent {
       return;
     }
    }
-   
    stopClick(){
     var buttons = this.state.cards.cardsValue.map((state, i) => (
     <button>
@@ -220,7 +219,7 @@ export default class MemoryMatch extends GameComponent {
       {state}
     </button>
     ));
-}
+  }
   newGame(){
   //   this.getSessionDatabaseRef().set(gameData);
     const {cards} = this.state;
@@ -243,29 +242,34 @@ export default class MemoryMatch extends GameComponent {
       cards: cardsCopy,
       players: playerCopy,
     })
+   } 
+   randomizeCards(array){
+    //randomize cards before loading 
+    // let newArray = array.sort(() => 0.5 - Math.random());
+    // return newArray;
+    var ctr = array.length, temp, index;
 
-   }  
-  randomizeCards(array){
-      //randomize cards before loading 
-      // let newArray = array.sort(() => 0.5 - Math.random());
-      // return newArray;
-      var ctr = array.length, temp, index;
-
-      // While there are elements in the array
-          while (ctr > 0) {
-      // Pick a random index
-              index = Math.floor(Math.random() * ctr);
-      // Decrease ctr by 1
-              ctr--;
-      // And swap the last element with it
-              temp = array[ctr];
-              array[ctr] = array[index];
-              array[index] = temp;
-          }
-          return array;
-  }
-
-
+    // While there are elements in the array
+        while (ctr > 0) {
+    // Pick a random index
+            index = Math.floor(Math.random() * ctr);
+    // Decrease ctr by 1
+            ctr--;
+    // And swap the last element with it
+            temp = array[ctr];
+            array[ctr] = array[index];
+            array[index] = temp;
+        }
+        return array;
+    }
+   componentWillMount(){
+    const {cards} = this.state;
+    let cardsCopy = [...cards];
+    let newDeck = this.randomizeCards(cardsCopy);
+    this.setState({
+      cards: newDeck
+    })
+   }
   render(){
     /*var id = this.getSessionId();
     var users = this.getSessionUserIds().map((user_id) => (
@@ -300,8 +304,7 @@ export default class MemoryMatch extends GameComponent {
    }
    
 
-
-    
+   
     return (
     //    <div>
     //      <p>Session ID: {id}</p>
