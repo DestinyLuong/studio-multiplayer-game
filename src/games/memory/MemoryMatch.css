@@ -1,12 +1,23 @@
+h1{
+ text-align: center;
+ padding-top: 8%   
+}
+.stats{
+   padding-left: 5%;
+}
 .game{
-    position: fixed;
-    top: 50%;
+    position: absolute;
+    top: 75%;
     left: 50%;
     transform: translate(-50%, -50%);
+    width: 100%;
+}
+.board{
+    text-align: center;
 }
 .card{
-    padding: 50px;
-
+    padding: 2%;
+    width: 15%
 }
 .controls{
     text-align: center
